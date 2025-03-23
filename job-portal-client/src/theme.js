@@ -3,18 +3,21 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // Blue
+      main: '#0a66c2', // LinkedIn Blue
     },
     secondary: {
-      main: '#3d5afe', // Light Blue
+      main: '#004182', // Dark Blue
     },
     success: {
-      main: '#2E7D32', // Green for Salary text
+      main: '#2E7D32', // Green
+    },
+    background: {
+      default: "#f4f4f4", // Light gray background
     },
   },
   typography: {
     fontFamily: "'Poppins', sans-serif",
-    h4: {
+    h5: {
       fontWeight: 700,
     },
     h6: {
@@ -25,14 +28,12 @@ const theme = createTheme({
     },
   },
   components: {
-    MuiCard: {
+    MuiButton: {
       styleOverrides: {
         root: {
-          boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-          transition: "0.3s",
-          "&:hover": {
-            boxShadow: "0px 6px 15px rgba(0,0,0,0.2)",
-          },
+          borderRadius: "20px",
+          textTransform: "none",
+          fontWeight: "bold",
         },
       },
     },

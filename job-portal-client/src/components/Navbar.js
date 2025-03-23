@@ -1,22 +1,12 @@
-import { AppBar, 
-  Toolbar, 
-  Typography, 
-  Box, 
-  IconButton, 
-  MenuItem, 
-  Menu } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, IconButton, MenuItem, Menu } from "@mui/material";
 import { Link } from "react-router-dom";
 import Sidebar from "./SideBar";
-import * as React from 'react';
-import AccountCircle from '@mui/icons-material/AccountCircle';
+import * as React from "react";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 
 export default function NavBar() {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
-  // const handleChange = (event) => {
-  //   setAuth(event.target.checked);
-  // };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -27,15 +17,17 @@ export default function NavBar() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Sidebar/>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Job Portal
-          </Typography>
+    <Box sx={{ flexGrow: 1 }}> 
+      <AppBar position="fixed" sx={{ backgroundColor: "#fff", color: "#000", boxShadow: 2 }}> 
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Sidebar />
+            <Typography variant="h6" component="div" sx={{ fontWeight: "bold", fontSize: "1.2rem", marginLeft: 2, color: "#000" }}>
+              Job Portal
+            </Typography>
+          </Box>
           {auth && (
-            <div>
+            <Box>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -44,30 +36,26 @@ export default function NavBar() {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <AccountCircle />
+                <AccountCircle sx={{ fontSize: 36, color: "#000" }} />
               </IconButton>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 keepMounted
-                transformOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                sx={{ mt: 1 }}
               >
-                <MenuItem component={Link} to="/profile">Profile</MenuItem>
-                <MenuItem component={Link} to="/logout">Logout</MenuItem>
+                <MenuItem component={Link} to="/profile" sx={{ "&:hover": { backgroundColor: "#f0f0f0" } }}>Profile</MenuItem>
+                <MenuItem component={Link} to="/logout" sx={{ "&:hover": { backgroundColor: "#f0f0f0" } }}>Logout</MenuItem>
               </Menu>
-            </div>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
+      <Toolbar /> {/* Adds spacing to push content below fixed navbar */}
     </Box>
   );
 }

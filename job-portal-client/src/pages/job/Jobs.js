@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { getJobs } from "../../api/job";
 import {
   Container, Card, CardContent, Typography,
-  Pagination, List, ListItem, Divider, Box, Grid
+  Pagination, Box, Grid, Avatar, Button
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import GlobalStyles from "../../styles/GlobalStyles"; // Import styles
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -29,56 +30,53 @@ const Jobs = () => {
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
-    <div>
+    <div style={{ backgroundColor: "#f4f4f4", minHeight: "100vh" }}>
       <Navbar />
       <Container maxWidth="md">
-        <Typography variant="h4" sx={{ my: 4, textAlign: "center", fontWeight: "bold" }}>
-          Available Jobs
+        <Typography variant="h5" sx={GlobalStyles.pageTitle}>
+          Recommended Jobs
         </Typography>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {currentJobs.map((job) => (
             <Grid item xs={12} key={job.id}>
-              <Card
-                sx={{
-                  boxShadow: 3,
-                  transition: "0.3s",
-                  "&:hover": { boxShadow: 6, transform: "scale(1.02)" },
-                  borderRadius: 2,
-                  padding: 2
-                }}
-              >
-                <CardContent>
+              <Card sx={GlobalStyles.jobCard}>
+                <Avatar sx={GlobalStyles.jobAvatar}>
+                  {job.title.charAt(0)}
+                </Avatar>
+                <CardContent sx={{ flexGrow: 1 }}>
                   <Link to={`/jobs/${job.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#3d5afe" }}>
+                    <Typography variant="h6" sx={GlobalStyles.jobTitle}>
                       {job.title}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      {job.description}
-                    </Typography>
-                    <Typography variant="subtitle2" sx={{ color: "#2E7D32", fontWeight: "bold" }}>
-                      Salary: ${job.salary}
-                    </Typography>
                   </Link>
+                  <Typography variant="body2" sx={GlobalStyles.jobLocation}>
+                    {job.location}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={GlobalStyles.jobSalary}>
+                    Salary: ₹{job.salary}
+                  </Typography>
                 </CardContent>
+                <Button 
+                  variant="contained" 
+                  component={Link} 
+                  to={`/jobs/${job.id}`}
+                >
+                  View
+                </Button>
               </Card>
             </Grid>
           ))}
         </Grid>
 
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+        <Box sx={GlobalStyles.paginationBox}>
           <Pagination
             count={Math.ceil(jobs.length / jobsPerPage)}
             page={page}
             onChange={(event, value) => setPage(value)}
             variant="outlined"
-            shape="rounded"
             color="primary"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                fontWeight: "bold",
-              },
-            }}
+            size="large"
           />
         </Box>
       </Container>
