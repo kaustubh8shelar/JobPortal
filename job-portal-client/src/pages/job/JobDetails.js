@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { getJobById } from "../../api/job";
 import { getApplications, applyForJob } from "../../api/application";
 import { getCurrentUser } from "../../api/user";
-import { Container, Card, CardContent, Typography, Button, Stack, Chip, Divider, Snackbar, Alert } from "@mui/material";
+import { Container, Card, CardContent, Typography, Button, Stack, Chip, Divider, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import Navbar from "../../components/Navbar";
 import GlobalStyles from "../../styles/GlobalStyles";
 
@@ -14,6 +14,7 @@ const JobDetails = () => {
   const [application, setApplication] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -53,6 +54,11 @@ const JobDetails = () => {
   }, [id]);
 
   const handleApply = async () => {
+    setOpenDialog(true);
+  };
+
+  const confirmApply = async () => {
+    setOpenDialog(false);
     if (!user) {
       setSnackbarMessage("You need to log in to apply for jobs.");
       setOpenSnackbar(true);
@@ -121,6 +127,16 @@ const JobDetails = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirm Application</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to apply for this job?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">Cancel</Button>
+          <Button onClick={confirmApply} color="primary" autoFocus>Apply</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

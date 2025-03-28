@@ -20,7 +20,7 @@ const AppRoutes = () => {
         {/* <Route path="/register" element={<Register />} /> */}
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/jobs" element={<PrivateRoute><Jobs /></PrivateRoute>} />
-        <Route path="/jobs/:id" element={<JobDetails />} />
+        <Route path="/jobs/:id" element={<PrivateRoute><JobDetails /></PrivateRoute>} />
         <Route path="/applications" element={<PrivateRoute><Applications /></PrivateRoute>} />
         <Route path="/search-jobs" element={<PrivateRoute><SearchJobs /></PrivateRoute>} />
         <Route path="/logout" element={<Logout />} />

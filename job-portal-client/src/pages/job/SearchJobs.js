@@ -72,12 +72,14 @@ const SearchJobs = () => {
   const handleSearch = async () => {
     setLoading(true);
     try {
+      console.log("Filters: ", filters);
       const response = await axios.get("http://localhost:8080/api/jobs", {
         params: {
           ...filters,
           skillsRequired: filters.skillsRequired.join(","),
         },
       });
+      console.log("response : ",response.data);
       setJobs(response.data);
     } catch (error) {
       console.error("Error fetching jobs", error);
@@ -130,7 +132,6 @@ const SearchJobs = () => {
               fullWidth
               label="Experience (Years)"
               name="requiredExperience"
-              type="number"
               value={filters.requiredExperience}
               onChange={(e) => setFilters({ ...filters, requiredExperience: e.target.value })}
             />

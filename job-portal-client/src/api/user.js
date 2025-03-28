@@ -14,9 +14,9 @@ export const getCurrentUser = async () => {
     try {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.sub;
-        // console.log("UserID : ", userId);
+        console.log("UserID : ", userId);
         const response = await axios.get(`${API_URL}/email/${userId}`);
-        // console.log("response : ", response.data);
+        console.log("response : ", response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching user", error);

@@ -23,6 +23,7 @@ const GlobalStyles = {
   },
   divider: {
     mb: 2,
+    mt: 1,
   },
   experience: {
     fontWeight: "bold",
