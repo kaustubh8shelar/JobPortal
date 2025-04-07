@@ -111,9 +111,10 @@ public class JobController {
         }
     }
 
-//    @GetMapping("/{skill}")
-//    public ResponseEntity<List<Job>> getJobBySkill(@PathVariable String skill){
-//        return ResponseEntity.ok(jobService.jobBySkill(skill));
-//    }
+    @GetMapping("/recommendations/{candidateID}")
+    public ResponseEntity<List<Job>> getRecommendedJobs(@PathVariable String candidateID) {
+        List<Job> recommendedJobs = jobService.recommendJobs(candidateID);
+        return ResponseEntity.ok(recommendedJobs);
+    }
 
 }

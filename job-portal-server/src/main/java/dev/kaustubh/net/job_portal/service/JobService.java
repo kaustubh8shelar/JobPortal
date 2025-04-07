@@ -4,19 +4,25 @@ import dev.kaustubh.net.job_portal.model.Application;
 import dev.kaustubh.net.job_portal.model.Job;
 import dev.kaustubh.net.job_portal.model.User;
 import dev.kaustubh.net.job_portal.repository.JobRepository;
+import dev.kaustubh.net.job_portal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class JobService {
     @Autowired
     private JobRepository jobRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -122,5 +128,38 @@ public class JobService {
         }
 
         return jobRepository.save(existingJob);
+    }
+
+    public List<Job> recommendJobs(String candidateId) {
+        User candidate = userRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+        List<Job> allJobs = jobRepository.findAll();
+
+        return allJobs.stream()
+                .filter(job -> hasMatchingSkills(job, candidate))
+                .filter(job -> isExperienceMatching(job.getRequiredExperience(), candidate.getExperience()))
+                .collect(Collectors.toList());
+    }
+
+    private boolean hasMatchingSkills(Job job, User candidate) {
+        Set<String> jobSkills = new HashSet<>(job.getSkillsRequired());
+        Set<String> candidateSkills = new HashSet<>(candidate.getSkills());
+        jobSkills.retainAll(candidateSkills);
+        return !jobSkills.isEmpty();  // Recommend if at least one skill matches
+    }
+
+    private boolean isExperienceMatching(String requiredExp, String candidateExp) {
+        int jobExp = parseExperience(requiredExp);
+        int candExp = parseExperience(candidateExp);
+        return candExp >= jobExp;
+    }
+
+    private int parseExperience(String experience) {
+        try {
+            return Integer.parseInt(experience);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

@@ -100,6 +100,14 @@ public class UserService {
             existingUser.setCompanyId(userUpdates.getCompanyId());
         }
 
+        if(userUpdates.getExperience() != null){
+            existingUser.setExperience(userUpdates.getExperience());
+        }
+
+        if(userUpdates.getEducation() != null){
+            existingUser.setEducation(userUpdates.getEducation());
+        }
+
         return userRepository.save(existingUser);
     }
 }

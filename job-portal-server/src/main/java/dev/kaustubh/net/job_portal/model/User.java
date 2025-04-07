@@ -19,6 +19,8 @@ public class User {
     private String role;
     private String companyId;
     private List<String> skills;
+    private String experience;
+    private String education;
 
     public String getId() {
         return id;
@@ -74,5 +76,21 @@ public class User {
 
     public void setSkills(List<String> skills) {
         this.skills = skills;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
     }
 }
