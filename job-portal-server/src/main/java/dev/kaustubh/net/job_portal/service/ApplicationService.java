@@ -52,10 +52,8 @@ public class ApplicationService {
         applicationRepository.deleteById(id);
     }
 
-    public Application createApplication(Application application, String userId, double rankScore){
-        System.out.println("userId: "+ userId + " rankScore: " + rankScore);
+    public Application createApplication(Application application, String userId){
         application.setUserId(userId);
-        application.setRankScore(rankScore);
         return applicationRepository.save(application);
     }
 

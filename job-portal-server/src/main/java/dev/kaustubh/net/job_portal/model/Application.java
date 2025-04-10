@@ -10,7 +10,6 @@ public class Application {
     private String jobId;
     private String userId;
     private String status;
-    private double rankScore;
     private String experience;
     private String education;
 
@@ -44,14 +43,6 @@ public class Application {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public double getRankScore() {
-        return rankScore;
-    }
-
-    public void setRankScore(double rankScore) {
-        this.rankScore = rankScore;
     }
 
     public String getExperience() {

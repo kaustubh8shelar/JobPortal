@@ -38,40 +38,6 @@ public class ApplicationController {
         return ResponseEntity.ok(applicationService.getApplications(userId, jobId, status));
     }
 
-    private double calculateRankScore(User user, Job job, Application application){
-        double matchingSkills = user.getSkills().stream()
-                .filter(skill -> job.getSkillsRequired().contains(skill))
-                .count();
-
-        double skillsScore = ((matchingSkills / job.getSkillsRequired().size()) * 100);
-
-        int experience = Optional.ofNullable(application.getExperience())
-                .map(e -> {
-                    try {
-                        return Integer.parseInt(e);
-                    } catch (NumberFormatException ex) {
-                        return 0; // Default value
-                    }
-                })
-                .orElse(0);
-        int reqExperience = Optional.ofNullable(job.getRequiredExperience())
-                .map(e -> {
-                    try {
-                        return Integer.parseInt(e);
-                    } catch (NumberFormatException ex) {
-                        return 0; // Default value
-                    }
-                })
-                .orElse(0);
-
-        double experienceScore = (((double) experience / reqExperience) * 100);
-        experienceScore = Math.min(experienceScore, 100);
-
-        double educationScore = application.getEducation().equals(job.getRequiredEducation()) ? 100 : 50;
-
-        return (skillsScore * 0.5) + (experienceScore * 0.3) + (educationScore * 0.2);
-    }
-
     @PostMapping("/create")
     public ResponseEntity<?> createApplication(@RequestBody Application application, HttpServletRequest request){
         try {
@@ -91,9 +57,7 @@ public class ApplicationController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found!");
             }
 
-            double rankScore = calculateRankScore(user, job, application);
-
-            Application savedApplication = applicationService.createApplication(application, email, rankScore);
+            Application savedApplication = applicationService.createApplication(application, email);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedApplication);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

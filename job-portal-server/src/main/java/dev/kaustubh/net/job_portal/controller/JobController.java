@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -40,15 +41,22 @@ public class JobController {
     private MongoTemplate mongoTemplate;
 
     @GetMapping("")
-    public ResponseEntity<List<Job>> getAllJobs(
+    public  ResponseEntity<List<Job>> getAllJobs(){
+        return ResponseEntity.ok(jobService.getAllJobs());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> getJobsByFilter(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String salary,
             @RequestParam(required = false) String requiredEducation,
             @RequestParam(required = false) String companyId,
             @RequestParam(required = false) List<String> skillsRequired,
-            @RequestParam(required = false) String requiredExperience){
-        return ResponseEntity.ok(jobService.getJobsByFilter(title, location, salary, requiredEducation, companyId, skillsRequired, requiredExperience));
+            @RequestParam(required = false) String requiredExperience,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(jobService.getJobsByFilter(title, location, salary, requiredEducation, companyId, skillsRequired, requiredExperience, page, size));
     }
 
     @GetMapping("/{id}")

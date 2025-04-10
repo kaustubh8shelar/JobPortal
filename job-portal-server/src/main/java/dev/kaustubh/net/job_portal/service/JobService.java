@@ -11,10 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +23,10 @@ public class JobService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public List<Job> getJobsByFilter(String title,String location,String salary,String requiredEducation,String companyId,List<String> skillsRequired, String requiredExperience){
+    public Map<String, Object> getJobsByFilter(String title, String location, String salary, String requiredEducation, String companyId, List<String> skillsRequired, String requiredExperience, int page, int size) {
         Query query = new Query();
-        if(title != null && !title.isEmpty()){
+
+        if (title != null && !title.isEmpty()) {
             query.addCriteria(Criteria.where("title").is(title));
         }
         if (location != null && !location.isEmpty()) {
@@ -46,14 +44,63 @@ public class JobService {
         if (skillsRequired != null && !skillsRequired.isEmpty()) {
             query.addCriteria(Criteria.where("skillsRequired").in(skillsRequired));
         }
+
+        List<Job> filteredJobs;
+
+        // Handle requiredExperience filtering manually
         if (requiredExperience != null && !requiredExperience.isEmpty()) {
-            query.addCriteria(Criteria.where("requiredExperience").is(requiredExperience));
+            try {
+                int experience = Integer.parseInt(requiredExperience.trim());
+                List<Job> allJobs = mongoTemplate.find(query, Job.class);
+
+                filteredJobs = allJobs.stream()
+                        .filter(job -> {
+                            try {
+                                String range = job.getRequiredExperience(); // Assuming it's like "2 - 5"
+                                String[] parts = range.split(" - ");
+                                if (parts.length == 2) {
+                                    int min = Integer.parseInt(parts[0].trim());
+                                    int max = Integer.parseInt(parts[1].trim());
+                                    return experience >= min && experience <= max;
+                                }
+                            } catch (Exception e) {
+                                // Skip invalid format
+                            }
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException e) {
+                // Invalid experience input, fallback to empty
+                filteredJobs = new ArrayList<>();
+            }
+        } else {
+            filteredJobs = mongoTemplate.find(query, Job.class);
         }
-        return mongoTemplate.find(query, Job.class);
+
+        long total = filteredJobs.size();
+
+        // Apply pagination manually
+        int fromIndex = Math.min((page - 1) * size, filteredJobs.size());
+        int toIndex = Math.min(fromIndex + size, filteredJobs.size());
+        List<Job> paginatedJobs = filteredJobs.subList(fromIndex, toIndex);
+
+        // Wrap results
+        Map<String, Object> response = new HashMap<>();
+        response.put("jobs", paginatedJobs);
+        response.put("totalElements", total);
+        response.put("currentPage", page);
+        response.put("totalPages", (int) Math.ceil((double) total / size));
+
+        return response;
     }
+
 
     public Job jobById(String id){
         return jobRepository.findById(id).orElseThrow(() -> new RuntimeException("Job not found!"));
+    }
+
+    public List<Job> getAllJobs(){
+        return jobRepository.findAll();
     }
 
     public List<String> jobSkills(){
@@ -135,6 +182,9 @@ public class JobService {
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
         List<Job> allJobs = jobRepository.findAll();
+        for(Job job: allJobs){
+            System.out.println("job: "+job.getTitle());
+        }
 
         return allJobs.stream()
                 .filter(job -> hasMatchingSkills(job, candidate))
@@ -150,16 +200,18 @@ public class JobService {
     }
 
     private boolean isExperienceMatching(String requiredExp, String candidateExp) {
-        int jobExp = parseExperience(requiredExp);
-        int candExp = parseExperience(candidateExp);
-        return candExp >= jobExp;
-    }
+        int candidateExperience = Integer.parseInt(candidateExp);  // assuming experience is already an integer
 
-    private int parseExperience(String experience) {
-        try {
-            return Integer.parseInt(experience);
-        } catch (NumberFormatException e) {
-            return 0;
+        String[] experienceRange = requiredExp.split(" - ");
+        System.out.println("requiredExp: "+requiredExp);
+        System.out.println("candidateExperience: "+candidateExperience);
+        System.out.println("Range: " + Arrays.toString(experienceRange));
+        if (experienceRange.length == 2) {
+            int minExperience = Integer.parseInt(experienceRange[0].trim());
+            int maxExperience = Integer.parseInt(experienceRange[1].trim());
+            System.out.println("Bool: " + (candidateExperience >= minExperience && candidateExperience <= maxExperience));
+            return candidateExperience >= minExperience && candidateExperience <= maxExperience;
         }
+        return false;  // If experience range is not valid
     }
 }
