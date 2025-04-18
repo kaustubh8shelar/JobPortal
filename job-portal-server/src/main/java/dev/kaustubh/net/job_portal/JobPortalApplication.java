@@ -35,7 +35,7 @@ public class JobPortalApplication {
 //		System.out.println("plainPassword: " + plainPassword);
 		System.out.println("Password matches: " + encoder.matches(plainPassword, hash));
 
-		return "This is a Job Portal!.";
+		return "This is a KS Job Portal!.";
 	}
 
 	@GetMapping("/test")
