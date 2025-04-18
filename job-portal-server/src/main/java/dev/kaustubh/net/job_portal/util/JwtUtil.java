@@ -14,10 +14,11 @@ public class JwtUtil {
     private static final String SECRET_KEY = "aRandomlyGeneratedSecretKeyForJobPortal12348888!";
     private static final long EXPIRATION_TIME = 1000 * 60 * 30;
 
-    public String generateToken(String email, String userId) {
+    public String generateToken(String email, String userId, String role) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -44,4 +45,20 @@ public class JwtUtil {
                 .getBody();
         return claims.getExpiration().before(new Date());
     }
+
+    public String extractRole(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("role", String.class);
+    }
+
+    public Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

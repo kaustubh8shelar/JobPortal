@@ -127,6 +127,7 @@ public class JobService {
         if (!jobRepository.existsById(id)) {
             throw new RuntimeException("Job with ID " + id + " not found.");
         }
+//        System.out.println("Deleting the job...");
         jobRepository.deleteById(id);
     }
 
@@ -183,7 +184,7 @@ public class JobService {
 
         List<Job> allJobs = jobRepository.findAll();
         for(Job job: allJobs){
-            System.out.println("job: "+job.getTitle());
+//            System.out.println("job: "+job.getTitle());
         }
 
         return allJobs.stream()
@@ -203,13 +204,13 @@ public class JobService {
         int candidateExperience = Integer.parseInt(candidateExp);  // assuming experience is already an integer
 
         String[] experienceRange = requiredExp.split(" - ");
-        System.out.println("requiredExp: "+requiredExp);
-        System.out.println("candidateExperience: "+candidateExperience);
-        System.out.println("Range: " + Arrays.toString(experienceRange));
+//        System.out.println("requiredExp: "+requiredExp);
+//        System.out.println("candidateExperience: "+candidateExperience);
+//        System.out.println("Range: " + Arrays.toString(experienceRange));
         if (experienceRange.length == 2) {
             int minExperience = Integer.parseInt(experienceRange[0].trim());
             int maxExperience = Integer.parseInt(experienceRange[1].trim());
-            System.out.println("Bool: " + (candidateExperience >= minExperience && candidateExperience <= maxExperience));
+//            System.out.println("Bool: " + (candidateExperience >= minExperience && candidateExperience <= maxExperience));
             return candidateExperience >= minExperience && candidateExperience <= maxExperience;
         }
         return false;  // If experience range is not valid
