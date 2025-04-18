@@ -2,16 +2,21 @@ import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 const PrivateRoute = ({ children }) => {
-  const [isSessionExpired, setIsSessionExpired] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      setIsSessionExpired(true);
+    const token = localStorage.getItem("token");
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+    if (!token) {
+      if (isLoggedIn) {
+        alert("Session Expired. Login again.");
+      }
+      setShouldRedirect(true);
     }
   }, []);
 
-  if (isSessionExpired) {
-    alert("Session Expired. Login again.");
+  if (shouldRedirect) {
     return <Navigate to="/login" />;
   }
 

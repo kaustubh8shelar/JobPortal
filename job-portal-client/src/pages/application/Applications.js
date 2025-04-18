@@ -4,7 +4,7 @@ import { getJobById } from "../../api/job";
 import { getCurrentUser } from "../../api/user";
 import { getCompanyById } from "../../api/company";
 import { 
-  Container, Card, CardContent, Typography, Grid, Box, Chip, Divider, Stepper, Step, StepLabel, List, ListItem, ListItemText, Skeleton 
+  Container, Card, CardContent, Typography, Grid, Chip, Divider, Stepper, Step, StepLabel, List, ListItem, ListItemText, Skeleton 
 } from "@mui/material";
 import Navbar from "../../components/Navbar";
 

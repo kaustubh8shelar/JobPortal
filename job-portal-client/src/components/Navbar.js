@@ -18,7 +18,7 @@ import Divider from '@mui/material/Divider';
 import GlobalStyles from "../styles/GlobalStyles";
 
 export default function NavBar() {
-  const [auth, setAuth] = React.useState(true);
+  const [auth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleMenu = (event) => {

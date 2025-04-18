@@ -38,6 +38,7 @@ const Login = () => {
     try {
       const res = await loginUser({ email, password });
       localStorage.setItem("token", res.data);
+      localStorage.setItem("isLoggedIn", "true");
       await getUserByEmail(email);
       navigate("/jobs");
     } catch (error) {

@@ -3,7 +3,7 @@ import { getRecommendedJobs } from "../../api/job";
 import { getCurrentUser } from "../../api/user";
 import {
   Container, Card, CardContent, Typography,
-  Pagination, Box, Grid, Avatar, Button, Skeleton
+  Pagination, Box, Grid, Avatar, Skeleton
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
