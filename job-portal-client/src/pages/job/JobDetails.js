@@ -25,11 +25,6 @@ const JobDetails = () => {
   const [company, setCompany] = useState(null);
 
   useEffect(() => {
-    if (localStorage.getItem("jobApplied")) {
-      setSnackbarMessage("Application submitted successfully!");
-      setOpenSnackbar(true);
-      localStorage.removeItem("jobApplied");
-    }
     const fetchJobDetails = async () => {
       try {
         const response = await getJobById(id);
@@ -105,13 +100,13 @@ const JobDetails = () => {
 
     try {
       await applyForJob(applicationData);
+      setSnackbarMessage("Application submitted successfully!");
       setApplication(applicationData);
-      localStorage.setItem("jobApplied", "true");
-      window.location.reload();
     } catch (error) {
       console.error("Error applying for job", error);
       setSnackbarMessage("Failed to apply. Please try again later.");
     }
+    setOpenSnackbar(true);
   };
 
   if (!job) {
