@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api/applications";
+const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL}/api/applications`;
 
 export const getApplications = async (userId) => {
-    console.log("Fetching applications for user ID: " + userId);
+    // console.log("Fetching applications for user ID: " + userId);
     return await axios.get(`${API_BASE_URL}?userId=${userId}`);
 };
 

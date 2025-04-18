@@ -4,10 +4,9 @@ import { getJobById } from "../../api/job";
 import { getCurrentUser } from "../../api/user";
 import { getCompanyById } from "../../api/company";
 import { 
-  Container, Card, CardContent, Typography, Grid, CircularProgress, Box, Chip, Divider, Stepper, Step, StepLabel, List, ListItem, ListItemText 
+  Container, Card, CardContent, Typography, Grid, Box, Chip, Divider, Stepper, Step, StepLabel, List, ListItem, ListItemText, Skeleton 
 } from "@mui/material";
 import Navbar from "../../components/Navbar";
-import GlobalStyles from "../../styles/GlobalStyles";
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
@@ -15,17 +14,14 @@ const Applications = () => {
   const [companyDetails, setCompanyDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [selectedLoading, setSelectedLoading] = useState(false);
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         const user = await getCurrentUser();
-        if (!user) {
-          console.error("User not found");
-          setLoading(false);
-          return;
-        }
-        
+        if (!user) return;
+
         const response = await getApplications(user.email);
         setApplications(response.data);
 
@@ -46,29 +42,50 @@ const Applications = () => {
         setJobDetails(jobData);
         setCompanyDetails(companyData);
       } catch (error) {
-        console.error("Error fetching applications, jobs, or companies", error);
+        console.error("Error fetching data", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchApplications();
   }, []);
 
   return (
     <div>
       <Navbar />
-      <Container maxWidth="lg">
-        <Typography variant="h5" sx={GlobalStyles.pageTitle}>Applications</Typography>
-
+      <Container maxWidth="lg" sx={{ marginTop: 4 }}>
         {loading ? (
-          <Box sx={GlobalStyles.loadingBox}>
-            <CircularProgress />
-          </Box>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ marginBottom: 2 }}>Your Applications</Typography>
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} height={50} variant="rectangular" sx={{ marginBottom: 1, borderRadius: 1 }} />
+                  ))}
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={8}>
+              <Card>
+                <CardContent>
+                  <Skeleton variant="text" height={40} width="60%" />
+                  <Skeleton variant="rectangular" height={30} width="30%" sx={{ marginTop: 1, marginBottom: 2 }} />
+                  <Skeleton variant="text" height={30} width="40%" />
+                  <Skeleton variant="text" height={30} width="50%" />
+                  <Skeleton variant="text" height={30} width="45%" />
+                  <Divider sx={{ marginY: 2 }} />
+                  <Skeleton variant="rectangular" height={30} width="90%" sx={{ marginTop: 1, marginBottom: 2 }} />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         ) : (
           <Grid container spacing={3}>
-            {/* Left Side - List of Applications */}
             <Grid item xs={12} md={4}>
-              <Card sx={GlobalStyles.applicationListCard}>
+              <Card>
                 <CardContent>
                   <Typography variant="h6" sx={{ marginBottom: 2 }}>Your Applications</Typography>
                   <List>
@@ -77,7 +94,12 @@ const Applications = () => {
                         <ListItem 
                           button 
                           key={application.id} 
-                          onClick={() => setSelectedApplication(application)}
+                          onClick={async () => {
+                            setSelectedLoading(true);
+                            setSelectedApplication(application);
+                            // Optional delay for visual effect
+                            setTimeout(() => setSelectedLoading(false), 500);
+                          }}                          
                           sx={{ 
                             backgroundColor: selectedApplication?.id === application.id ? "#e3f2fd" : "transparent", 
                             borderRadius: 1, 
@@ -98,45 +120,75 @@ const Applications = () => {
               </Card>
             </Grid>
 
-            {/* Right Side - Details of Selected Application */}
             <Grid item xs={12} md={8}>
               {selectedApplication ? (
-                <Card sx={GlobalStyles.applicationDetailsCard}>
+                 selectedLoading ? (
+                  <Card>
+                    <CardContent>
+                      <Skeleton variant="text" height={40} width="60%" />
+                      <Skeleton variant="rectangular" height={30} width="30%" sx={{ marginY: 2 }} />
+                      <Skeleton variant="text" height={30} width="50%" />
+                      <Skeleton variant="text" height={30} width="40%" />
+                      <Skeleton variant="text" height={30} width="45%" />
+                      <Divider sx={{ marginY: 2 }} />
+                      <Skeleton variant="rectangular" height={30} width="90%" sx={{ marginY: 1 }} />
+                    </CardContent>
+                  </Card>
+                ): (
+                <Card>
                   <CardContent>
-                    <Typography variant="h6" sx={GlobalStyles.jobTitle}>
+                    <Typography variant="h6" sx={{ marginBottom: 1 }}>
                       {jobDetails[selectedApplication.jobId]?.title || "Loading..."}
                     </Typography>
                     <Chip 
                       label={selectedApplication.status} 
-                      color={selectedApplication.status === "Hired" ? "success" : selectedApplication.status === "Rejected" ? "error" : "warning"} 
-                      sx={GlobalStyles.statusChip} 
+                      color={
+                        selectedApplication.status === "Hired" ? "success" :
+                        selectedApplication.status === "Rejected" ? "error" : "warning"
+                      } 
+                      sx={{ marginBottom: 2 }} 
                     />
-                    <Typography variant="subtitle1" color="primary" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                       Salary: ₹{jobDetails[selectedApplication.jobId]?.salary || "N/A"}
                     </Typography>
-                    <Typography variant="body2" sx={GlobalStyles.jobDetails}>
+                    <Typography variant="body2">
                       Company: {companyDetails[jobDetails[selectedApplication.jobId]?.companyId] || "Loading..."}
                     </Typography>
-                    <Typography variant="body2" sx={GlobalStyles.jobDetails}>
+                    <Typography variant="body2">
                       Location: {jobDetails[selectedApplication.jobId]?.location || "N/A"}
                     </Typography>
                     <Divider sx={{ marginY: 2 }} />
 
-                    {/* Timeline Stepper */}
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold", marginBottom: 1 }}>
                       Application Status
                     </Typography>
-                    <Stepper activeStep={["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired", "Rejected"].indexOf(selectedApplication.status)} alternativeLabel>
-                      {["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired", "Rejected"].map((label, index) => (
-                        <Step key={index}>
-                          <StepLabel>{label}</StepLabel>
+
+                    {selectedApplication.status === "Rejected" ? (
+                      <Stepper activeStep={0} alternativeLabel>
+                        <Step>
+                          <StepLabel error>Application Rejected</StepLabel>
                         </Step>
-                      ))}
-                    </Stepper>
+                      </Stepper>
+                    ) : (
+                      <Stepper
+                        activeStep={
+                          ["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired"].indexOf(selectedApplication.status)
+                        }
+                        alternativeLabel
+                      >
+                        {["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired"].map((label, index) => (
+                          <Step key={index}>
+                            <StepLabel>{label}</StepLabel>
+                          </Step>
+                        ))}
+                      </Stepper>
+                    )}
                   </CardContent>
                 </Card>
-              ) : (
-                <Typography variant="h6" sx={{ textAlign: "center", marginTop: 3 }}>Select an application to view details</Typography>
+              )) : (
+                <Typography variant="h6" sx={{ textAlign: "center", marginTop: 3 }}>
+                  Select an application to view details
+                </Typography>
               )}
             </Grid>
           </Grid>

@@ -3,9 +3,16 @@ import { useParams } from "react-router-dom";
 import { getJobById } from "../../api/job";
 import { getApplications, applyForJob } from "../../api/application";
 import { getCurrentUser } from "../../api/user";
-import { Container, Card, CardContent, Typography, Button, Stack, Chip, Divider, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Container, Card, CardContent, Typography, Button, Stack, 
+  Chip, Divider, Snackbar, Alert, Dialog, DialogActions, DialogContent, 
+  DialogContentText, DialogTitle, Skeleton, Box } from "@mui/material";
 import Navbar from "../../components/Navbar";
 import GlobalStyles from "../../styles/GlobalStyles";
+import { getCompanyById } from "../../api/company";
+import { Avatar } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -15,16 +22,34 @@ const JobDetails = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [company, setCompany] = useState(null);
 
   useEffect(() => {
+    if (localStorage.getItem("jobApplied")) {
+      setSnackbarMessage("Application submitted successfully!");
+      setOpenSnackbar(true);
+      localStorage.removeItem("jobApplied");
+    }
     const fetchJobDetails = async () => {
       try {
         const response = await getJobById(id);
-        setJob(response.data);
+        setTimeout(async () => {
+          const jobData = response.data;
+          setJob(jobData);
+    
+          if (jobData.companyId) {
+            try {
+              const companyRes = await getCompanyById(jobData.companyId);
+              setCompany(companyRes.data);
+            } catch (err) {
+              console.error("Error fetching company info", err);
+            }
+          }
+        }, 800);
       } catch (error) {
         console.error("Error fetching job details", error);
       }
-    };
+    };    
 
     const fetchUserDetails = async () => {
       try {
@@ -35,14 +60,14 @@ const JobDetails = () => {
         if (Array.isArray(appResponse.data) && appResponse.data.length > 0) {
           appResponse.data.forEach((application, index) => {
             if (application.jobId === id) {
-              console.log(`Job ID at index ${index}: `, application.jobId);
+              // console.log(`Job ID at index ${index}: `, application.jobId);
               setApplication(appResponse.data);
             } else {
-              console.log("Do nothing");
+              // console.log("Do nothing");
             }
           });
         } else {
-          console.log("No applications found or appResponse.data is not an array.");
+          // console.log("No applications found or appResponse.data is not an array.");
         }
       } catch (error) {
         console.error("Error fetching user or application details", error);
@@ -75,22 +100,51 @@ const JobDetails = () => {
       jobId: id,
       experience: user.experience || "",
       education: user.education || "",
-      status: "Pending"
+      status: "Applied"
     };
 
     try {
       await applyForJob(applicationData);
-      setSnackbarMessage("Application submitted successfully!");
       setApplication(applicationData);
+      localStorage.setItem("jobApplied", "true");
+      window.location.reload();
     } catch (error) {
       console.error("Error applying for job", error);
       setSnackbarMessage("Failed to apply. Please try again later.");
     }
-    setOpenSnackbar(true);
   };
 
   if (!job) {
-    return <Typography sx={{ textAlign: "center", mt: 4 }}>Loading...</Typography>;
+    return (
+      <div>
+      <Navbar />
+      <Container maxWidth="md" sx={GlobalStyles.container}>
+        <Card sx={GlobalStyles.card}>
+          <CardContent>
+            <Skeleton variant="text" width="60%" height={40} />
+            <Skeleton variant="text" width="40%" height={30} sx={{ mt: 1 }} />
+            <Divider sx={{ my: 2 }} />
+            <Skeleton variant="text" width="30%" height={24} />
+            <Skeleton variant="text" width="50%" height={24} sx={{ mt: 1 }} />
+            <Skeleton variant="text" width="30%" height={24} sx={{ mt: 1 }} />
+            <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+              {[...Array(3)].map((_, index) => (
+                <Skeleton key={index} variant="rounded" width={80} height={32} />
+              ))}
+            </Stack>
+            <Skeleton variant="rectangular" width="150px" height={40} sx={{ mt: 3 }} />
+          </CardContent>
+        </Card>
+
+        <Card sx={GlobalStyles.card}>
+          <Box sx={{ flex: 1 }}>
+            <Skeleton variant="text" width="40%" height={30} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" height={150} />
+          </Box>
+        </Card>
+      </Container>
+    </div>
+    );
   }
 
   return (
@@ -98,13 +152,43 @@ const JobDetails = () => {
       <Navbar />
       <Container maxWidth="md" sx={GlobalStyles.container}>
         <Card sx={GlobalStyles.card}>
+        <Box sx={{ position: "relative" }}>
+          {company?.logoUrl && (
+            <Avatar
+              src={company.logoUrl}
+              alt={company.name}
+              sx={{
+                width: 60,
+                height: 60,
+                position: "absolute",
+                top: 16,
+                right: 16,
+                // boxShadow: 3,
+                border: "2px solid white",
+                bgcolor: "white"
+              }}
+            />
+          )}
           <CardContent>
-            <Typography variant="h4" sx={GlobalStyles.title}>{job.title}</Typography>
-            <Typography variant="h6" sx={GlobalStyles.company}>{job.company}</Typography>
+              <Typography variant="h4" sx={GlobalStyles.title}>{job.title}</Typography>
+              <Typography variant="body1" sx={GlobalStyles.company}>{company?.name || job.company}</Typography>
             <Divider sx={GlobalStyles.divider} />
-            <Typography variant="subtitle1" sx={GlobalStyles.experience}>{job.requiredExperience} Years</Typography>
-            <Typography variant="subtitle1" sx={GlobalStyles.salary}>Salary: ₹{job.salary}</Typography>
-            <Typography variant="body1" sx={GlobalStyles.location}>{job.location}</Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2, mt: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5  }}>
+                  <WorkOutlineIcon fontSize="small" sx={{ color: "#000" }}  />
+                  <Typography variant="body2" sx={{ color: "#000" }}>{job.requiredExperience} Yrs</Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <LocationOnIcon fontSize="small" sx={{ color: "#000" }}  />
+                  <Typography variant="body2" sx={{ color: "#000" }} >{job.location}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <CurrencyRupeeIcon fontSize="small" sx={{ color: "#000" }}  />
+                  <Typography variant="body2" sx={{ color: "#000" }} >
+                    {job.salary}
+                  </Typography>
+                </Box>
+            </Box>
             <Stack direction="row" spacing={1} sx={GlobalStyles.skillsStack}>
               {job.skillsRequired.map((skill, index) => (
                 <Chip key={index} label={skill} color="primary" variant="outlined" />
@@ -114,6 +198,7 @@ const JobDetails = () => {
               {application ? "Already Applied" : "Apply Now"}
             </Button>
           </CardContent>
+          </Box>
         </Card>
         <Card sx={GlobalStyles.card}>
           <CardContent>

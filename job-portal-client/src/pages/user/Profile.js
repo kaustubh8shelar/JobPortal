@@ -12,7 +12,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await getCurrentUser();
-        console.log("Curr User: ", response);
+        // console.log("Curr User: ", response);
         setUser(response);
       } catch (error) {
         console.error("Error fetching user profile", error);
@@ -25,8 +25,28 @@ const Profile = () => {
   }, []);
 
   if (loading) {
-    return <CircularProgress style={{ display: "block", margin: "50px auto" }} />;
+    return (
+      <>
+        <Navbar />
+        <Container maxWidth="md" sx={{ mt: 10 }}>
+          <Card sx={{ p: 3 }}>
+            <div style={{ width: 120, height: 120, borderRadius: "50%", background: "#e0e0e0", marginBottom: 24, animation: "pulse 1.5s infinite" }} />
+            <div style={{ height: 24, width: "50%", background: "#e0e0e0", marginBottom: 16, animation: "pulse 1.5s infinite" }} />
+            <div style={{ height: 20, width: "30%", background: "#e0e0e0", marginBottom: 16, animation: "pulse 1.5s infinite" }} />
+            <div style={{ height: 16, width: "70%", background: "#e0e0e0", marginBottom: 24, animation: "pulse 1.5s infinite" }} />
+            <div style={{ height: 24, width: "40%", background: "#e0e0e0", marginBottom: 16, animation: "pulse 1.5s infinite" }} />
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: 24 }}>
+              {[...Array(8)].map((_, index) => (
+                <div key={index} style={{ height: 28, width: 80, background: "#e0e0e0", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
+              ))}
+            </div>
+            <div style={{ height: 24, width: "40%", background: "#e0e0e0", animation: "pulse 1.5s infinite" }} />
+          </Card>
+        </Container>
+      </>
+    );
   }
+  
 
   return (
     <div>

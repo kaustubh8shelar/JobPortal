@@ -1,3 +1,5 @@
+import { height } from "@mui/system";
+
 const GlobalStyles = {
   container: {
     mt: 8,
@@ -9,8 +11,8 @@ const GlobalStyles = {
     boxShadow: 2,
     transition: "0.3s",
     "&:hover": { boxShadow: 5, transform: "scale(1.02)" },
-    display: "flex",
-    alignItems: "center",
+    // display: "flex",
+    // alignItems: "center",
     backgroundColor: "#fff",
   },
   title: {
@@ -18,7 +20,7 @@ const GlobalStyles = {
     mb: 1,
   },
   company: {
-    mb: 2,
+    fontWeight: "bold",
     color: "textSecondary",
   },
   divider: {
@@ -42,6 +44,7 @@ const GlobalStyles = {
   skillsStack: {
     flexWrap: "wrap",
     mb: 2,
+    mt: 2,
   },
   applyButton: {
     mt: 2,
@@ -59,20 +62,30 @@ const GlobalStyles = {
     my: 4,
     textAlign: "left",
     fontWeight: "bold",
-    color: "#0a66c2",
   },
   jobCard: {
     boxShadow: 2,
     transition: "0.3s",
     "&:hover": { boxShadow: 5, transform: "scale(1.02)" },
-    borderRadius: 2,
+    borderRadius: 5,
     p: 2,
     display: "flex",
     alignItems: "center",
     backgroundColor: "#fff",
   },
+  recommendedJobCard: {
+    boxShadow: 1,
+    transition: "0.3s",
+    "&:hover": { boxShadow: 5, transform: "scale(1.02)" },
+    borderRadius: 5,
+    height: "100%",
+    display: "flex",
+    alignItems: "left",
+    backgroundColor: "#fff",
+    flexDirection: "column",
+    justifyContent: "space-between" 
+  },
   jobAvatar: {
-    bgcolor: "#0a66c2",
     width: 50,
     height: 50,
     mr: 2,
@@ -85,8 +98,6 @@ const GlobalStyles = {
     color: "#666",
   },
   jobSalary: {
-    color: "#2E7D32",
-    fontWeight: "bold",
   },
   paginationBox: {
     display: "flex",
@@ -95,6 +106,16 @@ const GlobalStyles = {
   },
   noApplicationsText: {
     mt: 8
+  },
+  iconButtonStyle: {
+    display: "flex",
+    flexDirection: "column",
+    padding: 0,
+    color: "#999",
+    backgroundColor: "transparent",
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
   }
 };
 
