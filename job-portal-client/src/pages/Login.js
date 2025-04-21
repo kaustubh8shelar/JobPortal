@@ -71,7 +71,7 @@ const Login = () => {
                 variant="outlined"
                 margin="normal"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
               />
               <TextField
                 fullWidth
