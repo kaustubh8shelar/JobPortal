@@ -102,7 +102,12 @@ const Jobs = () => {
         <Grid container spacing={2}>
           {currentJobs.map((job) => (
             <Grid item xs={12} key={job.id}>
-              <Link to={`/jobs/${job.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <a 
+                href={`/jobs/${job.id}`} 
+                target="_blank"   
+                rel="noopener noreferrer" 
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 <Card sx={GlobalStyles.jobCard}>
                 <Avatar
                   src={companyDetails[job.companyId]?.logoUrl || ""}
@@ -141,7 +146,7 @@ const Jobs = () => {
                         </Typography>
                   </CardContent>
                 </Card>
-              </Link>
+              </a>
             </Grid>
           ))}
         </Grid>

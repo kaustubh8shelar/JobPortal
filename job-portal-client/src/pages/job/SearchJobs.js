@@ -309,7 +309,12 @@ const SearchJobs = () => {
           ) : (
             jobs.map((job) => (
               <Grid item xs={12} key={job.id}>
-                <Link to={`/jobs/${job.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <a 
+                  href={`/jobs/${job.id}`} 
+                  target="_blank"   
+                  rel="noopener noreferrer" 
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   <Card sx={GlobalStyles.jobCard}>
                     <CardContent>
                     <Box sx={{ display: "flex", alignItems: "center"}}>
@@ -335,7 +340,7 @@ const SearchJobs = () => {
                     </Typography>
                   </CardContent>
                   </Card>
-                </Link>
+                </a>
               </Grid>
             ))
           )}
@@ -446,7 +451,12 @@ const SearchJobs = () => {
                     flex: "0 0 auto",
                   }}
                 >
-                  <Link to={`/jobs/${job.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <a 
+                    href={`/jobs/${job.id}`} 
+                    target="_blank"   
+                    rel="noopener noreferrer" 
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
                     <Card sx={GlobalStyles.recommendedJobCard}>
                       <CardContent>
                         <Typography variant="h6">{job.title}</Typography>
@@ -468,7 +478,7 @@ const SearchJobs = () => {
                         </Typography>
                       </CardContent>
                     </Card>
-                  </Link>
+                  </a> 
                 </Box>
               ))}
             </Box>
