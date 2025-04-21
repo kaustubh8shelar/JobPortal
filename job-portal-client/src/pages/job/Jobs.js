@@ -12,12 +12,14 @@ import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import GlobalStyles from "../../styles/GlobalStyles";
 import { getCompanyById } from "../../api/company"; 
+import { getApplications } from "../../api/application";
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [companyDetails, setCompanyDetails] = useState({});
+  const [appliedJobIds, setAppliedJobIds] = useState(new Set());
   const jobsPerPage = 5;
 
   useEffect(() => {
@@ -25,8 +27,16 @@ const Jobs = () => {
       try {
         const userRes = await getCurrentUser();
         const userId = userRes?.id;
+        const userEmail = userRes?.email;
         if (userId) {
-          const jobRes = await getRecommendedJobs(userId);
+          const [jobRes, appRes] = await Promise.all([
+            getRecommendedJobs(userId),
+            getApplications(userEmail)
+          ]);
+          console.log(appRes);
+          const appliedIds = new Set(appRes.data.map((app) => app.jobId));
+          setAppliedJobIds(appliedIds);
+  
           await fetchCompanyNames(jobRes.data);
           setJobs(jobRes.data || []);
         }
@@ -36,9 +46,9 @@ const Jobs = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchJobs();
-  }, []);
+  }, []);  
 
   const fetchCompanyNames = async (jobsList) => {
     const companyData = {};
@@ -117,9 +127,19 @@ const Jobs = () => {
                   {companyDetails[job.companyId]?.name?.charAt(0) || job.title.charAt(0)}
                 </Avatar>
                   <CardContent sx={{ flexGrow: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Typography variant="h6" sx={GlobalStyles.jobTitle}>
                         {job.title}
                       </Typography>
+                      {appliedJobIds.has(job.id) && (
+                        <Typography
+                          variant="caption"
+                          sx={{ px: 1, py: 0.5, backgroundColor: "#e0e0e0", borderRadius: "4px", fontWeight: 500, color: "text.secondary" }}
+                        >
+                          Already Applied
+                        </Typography>
+                      )}
+                    </Box>
                       <Box sx={{ display: "flex", alignItems: "center"}}>
                       <Typography variant="body2" sx={GlobalStyles.company}>
                         {companyDetails[job.companyId]?.name || "Loading company..."}
