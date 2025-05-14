@@ -6,7 +6,6 @@ A full-stack Job Portal web application that connects job seekers with recruiter
 
 - User registration and login
 - Search and apply for jobs
-- AI-powered job recommendations
 - View and manage applications
 - Recruiter job posting and applicant tracking
 - Filters by location, experience, and skills
@@ -20,7 +19,9 @@ A full-stack Job Portal web application that connects job seekers with recruiter
 ## Project Structure
 
 job-portal/
+
 ├── job-portal-client/ # React frontend
+
 └── job-portal-server/ # Spring Boot backend
 
 ## Web Application URL
