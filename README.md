@@ -14,7 +14,7 @@ A full-stack Job Portal web application that connects job seekers with recruiter
 
 - **Frontend**: React, Material UI (MUI)
 - **Backend**: Spring Boot (Java), RESTful APIs
-- **Database**: MySQL (or your preferred RDBMS)
+- **Database**: MongoDB
 
 ## Project Structure
 
