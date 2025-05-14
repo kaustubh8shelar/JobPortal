@@ -61,4 +61,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<String>> getUserRoles() {
+        return ResponseEntity.ok(userService.getAllUserRoles());
+    }
+
 }

@@ -33,7 +33,7 @@ public class CompanyController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String industry,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) int size,
+            @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String foundedYear,
             @RequestParam(required = false) String createdBy,
             @RequestParam(required = false) String createdAt,
@@ -77,5 +77,10 @@ public class CompanyController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/companyNames")
+    public ResponseEntity<List<String>> getAllCompanyNames(){
+        return ResponseEntity.ok(companyService.getAllCompanyNames());
     }
 }

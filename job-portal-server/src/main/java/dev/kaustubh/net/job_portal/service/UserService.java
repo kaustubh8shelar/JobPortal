@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -109,5 +110,11 @@ public class UserService {
         }
 
         return userRepository.save(existingUser);
+    }
+
+    public List<String> getAllUserRoles() {
+        return mongoTemplate.getCollection("users")
+                .distinct("name", String.class)
+                .into(new ArrayList<>());
     }
 }

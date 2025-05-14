@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyService {
@@ -18,7 +20,7 @@ public class CompanyService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public List<Company> getCompanyByFilter(String name, String industry, String location, int size,
+    public List<Company> getCompanyByFilter(String name, String industry, String location, Integer size,
                                             String foundedYear, String createdBy, String createdAt, String updatedAt) {
         Query query = new Query();
         if(name != null && !name.isEmpty()) {
@@ -30,7 +32,7 @@ public class CompanyService {
         if(location != null && !location.isEmpty()) {
             query.addCriteria(Criteria.where("location").is(location));
         }
-        if(size > 0) {
+        if(size != null) {
             query.addCriteria(Criteria.where("size").is(size));
         }
         if(foundedYear != null && !foundedYear.isEmpty()) {
@@ -117,5 +119,12 @@ public class CompanyService {
             }
         }
         return companyRepository.save(existingCompany);
+    }
+
+    public List<String> getAllCompanyNames() {
+        return mongoTemplate
+                .getCollection("companies")
+                .distinct("name", String.class)
+                .into(new ArrayList<>());
     }
 }
