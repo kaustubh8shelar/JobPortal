@@ -136,7 +136,7 @@ const SearchJobs = () => {
     setCompanyDetails((prev) => ({ ...prev, ...companyData }));
   };
   const handleLocationChange = (event, newValue) => {
-    setSearchLocation(newValue || "");
+    setSearchLocation("");
     setFilters({ ...filters, location: newValue || "" });
     setTimeout(() => setLocations([]), 100);
   };

@@ -10,6 +10,7 @@ import Profile from "../pages/user/Profile";
 import JobDetails from "../pages/job/JobDetails";
 import UseAuthCheck from "../api/useAuthCheck";
 import DelayedRoute from "./DelayedRoute";
+import Register from "../pages/Register";
 
 const AppRoutes = () => {
   return (
@@ -19,7 +20,7 @@ const AppRoutes = () => {
       {/* <Route element={<DelayedRoute delay={500} />}> */}
         <Route path="/" element={<PrivateRoute><Jobs /></PrivateRoute>} />
         <Route path="/login" element={<Login />} />
-        {/* <Route path="/register" element={<Register />} /> */}
+        <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/jobs" element={<PrivateRoute><Jobs /></PrivateRoute>} />
         <Route path="/jobs/:id" element={<PrivateRoute><JobDetails /></PrivateRoute>} />
