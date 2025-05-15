@@ -58,10 +58,15 @@ const Login = () => {
             <Box display="flex" justifyContent="center">
               <CircularProgress />
             </Box>
+            <Box display="flex" justifyContent="center">
+              <Typography>
+                This might take some time. Please wait...
+              </Typography>
+            </Box>
           </>
         ) : (
           <>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h5" fontWeight="bold" textAlign="center" gutterBottom>
               Login
             </Typography>
             <form onSubmit={handleLogin}>
@@ -101,6 +106,18 @@ const Login = () => {
                 Login
               </Button>
             </form>
+            <Box textAlign="center" mt={2}>
+              <Typography variant="body2">
+                Don&apos;t have an account?{" "}
+                <Button
+                  variant="text"
+                  onClick={() => navigate("/register")}
+                  sx={{ textTransform: "none", fontWeight: "bold" }}
+                >
+                  Register here
+                </Button>
+              </Typography>
+            </Box>
           </>
         )}
       </Box>
