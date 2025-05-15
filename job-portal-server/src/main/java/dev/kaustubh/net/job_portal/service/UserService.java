@@ -5,6 +5,8 @@ import dev.kaustubh.net.job_portal.repository.UserRepository;
 import dev.kaustubh.net.job_portal.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,17 @@ public class UserService {
     }
 
     public User registerUser(User user){
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email is required.");
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("email").is(user.getEmail()));
+        User existingUser = mongoTemplate.findOne(query, User.class);
+        if (existingUser != null) {
+            throw new IllegalArgumentException("User with this email already exists.");
+        }
+
         if (user.getId() == null || user.getId().isEmpty()) {
             user.setId(null);
         }

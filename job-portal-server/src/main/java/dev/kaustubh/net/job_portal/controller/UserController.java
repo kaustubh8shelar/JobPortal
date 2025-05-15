@@ -38,6 +38,7 @@ public class UserController {
             User savedUser =userService.registerUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         } catch (IllegalArgumentException ex) {
+            System.out.println("Exception: "+ ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
