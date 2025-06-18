@@ -33,14 +33,25 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
-            steps {
-                bat """
-                docker rm -f ${CONTAINER_NAME} || exit 0
-                docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${IMAGE_NAME}
-                """
-            }
-        }
+         stage('Run Container') {
+                    environment {
+                        MONGO_DATABASE = credentials('MONGO_DATABASE')
+                        MONGO_USER = credentials('MONGO_USER')
+                        MONGO_PASS = credentials('MONGO_PASS')
+                        MONGO_CLUSTER = credentials('MONGO_CLUSTER')
+                    }
+                    steps {
+                        bat """
+                        docker rm -f ${CONTAINER_NAME} || exit 0
+                        docker run -d --name ${CONTAINER_NAME} ^
+                            -e MONGO_DATABASE=${MONGO_DATABASE} ^
+                            -e MONGO_USER=${MONGO_USER} ^
+                            -e MONGO_PASS=${MONGO_PASS} ^
+                            -e MONGO_CLUSTER=${MONGO_CLUSTER} ^
+                            -p 8080:8080 ${IMAGE_NAME}
+                        """
+                    }
+                }
     }
 
     post {
