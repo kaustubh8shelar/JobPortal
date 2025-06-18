@@ -40,19 +40,22 @@ export default function NavBar() {
       <AppBar position="fixed" sx={{ backgroundColor: "#fff", color: "#000", boxShadow: 2 }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           {/* Brand Name */}
-          <Typography
-            variant="h6"
+          <Box
             component={Link}
             to="/"
             sx={{
-              fontWeight: "bold",
-              fontSize: "1.2rem",
-              color: "#000",
-              textDecoration: "none"
+              display: 'flex',
+              alignItems: 'center',
+              textDecoration: 'none'
             }}
           >
-            Job Portal
-          </Typography>
+            <Box
+              component="img"
+              src="/JobNudge_Logo.png"
+              alt="Job Portal Logo"
+              sx={{ height: 25 }}
+            />
+          </Box>
 
           {/* Menu Items with Light Icons and Labels */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
