@@ -14,16 +14,14 @@ pipeline {
         }
 
         stage('Build App') {
-			steps {
-				dir('job-portal-server') {
-					sh '''
-						chmod +x mvnw
-						./mvnw clean package -DskipTests
-					'''
-				}
-			}
-		}
-
+            steps {
+                dir('job-portal-server') {
+                    bat '''
+                        mvnw.cmd clean package -DskipTests
+                    '''
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -37,8 +35,8 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh """
-                docker rm -f ${CONTAINER_NAME} || true
+                bat """
+                docker rm -f ${CONTAINER_NAME} || exit 0
                 docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${IMAGE_NAME}
                 """
             }
