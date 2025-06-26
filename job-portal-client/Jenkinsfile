@@ -14,28 +14,25 @@ pipeline {
         }
 
         stage('Build React App Docker Image') {
+			environment {
+				REACT_APP_API_BASE_URL = credentials('REACT_APP_API_BASE_URL')
+            }
             steps {
                 dir('job-portal-client') {
                     script {
-                        dockerImage = docker.build("${IMAGE_NAME}")
+                        dockerImage = docker.build("${IMAGE_NAME}", "--build-arg REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}")
                     }
                 }
             }
         }
 
         stage('Run Frontend Container') {
-			environment {
-				REACT_APP_API_BASE_URL = credentials('REACT_APP_API_BASE_URL')
-            }
             steps {
                 script {
-			bat "echo REACT_APP_API_BASE_URL=%REACT_APP_API_BASE_URL%"
                     // Stop and remove existing container if running
                     bat """
                         docker rm -f ${CONTAINER_NAME} || exit 0
-                        docker run -d --name ${CONTAINER_NAME} ^
-							-e REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL} ^
-							-p 3000:3000 ${IMAGE_NAME}
+                        docker run -d --name ${CONTAINER_NAME} -p 3000:3000 ${IMAGE_NAME}
                     """
                 }
             }
