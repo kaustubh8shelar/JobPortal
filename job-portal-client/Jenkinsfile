@@ -26,6 +26,8 @@ pipeline {
         stage('Run Frontend Container') {
 			environment {
 				REACT_APP_API_BASE_URL = credentials('REACT_APP_API_BASE_URL')
+				echo "REACT_APP_API_BASE_URL"
+				echo REACT_APP_API_BASE_URL
             }
             steps {
                 script {
