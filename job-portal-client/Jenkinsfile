@@ -19,9 +19,10 @@ pipeline {
             }
             steps {
                 dir('job-portal-client') {
-                    script {
-                        dockerImage = docker.build("${IMAGE_NAME}", "--build-arg REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}")
-                    }
+                    bat """
+                        echo Building Docker image
+                        docker build -t ${IMAGE_NAME} --build-arg REACT_APP_API_BASE_URL=%REACT_APP_API_BASE_URL% .
+                    """
                 }
             }
         }
