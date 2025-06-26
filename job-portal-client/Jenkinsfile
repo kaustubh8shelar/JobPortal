@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "jobnudge-frontend"
+        CONTAINER_NAME = "jobnudge-frontend-container"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'dev01', url: 'https://github.com/kaustubh8shelar/JobPortal.git'
+            }
+        }
+
+        stage('Build React App Docker Image') {
+            steps {
+                dir('job-portal-client') {
+                    script {
+                        dockerImage = docker.build("${IMAGE_NAME}")
+                    }
+                }
+            }
+        }
+
+        stage('Run Frontend Container') {
+			environment {
+				REACT_APP_API_BASE_URL = credentials('REACT_APP_API_BASE_URL')
+            }
+            steps {
+                script {
+                    // Stop and remove existing container if running
+                    bat """
+                        docker rm -f ${CONTAINER_NAME} || exit 0
+                        docker run -d --name ${CONTAINER_NAME} ^
+							-e REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL} ^
+							-p 3000:3000 ${IMAGE_NAME}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Frontend React app deployed successfully!"
+        }
+        failure {
+            echo "Frontend build or deployment failed."
+        }
+    }
+}
