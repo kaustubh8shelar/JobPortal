@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "jobnudge"
-        CONTAINER_NAME = "jobnudge-container"
+        IMAGE_NAME = "jobnudge-backend"
+        CONTAINER_NAME = "jobnudge-backend-container"
     }
 
     stages {
@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-         stage('Run Container') {
+         stage('Run Backend Container') {
                     environment {
                         MONGO_DATABASE = credentials('MONGO_DATABASE')
                         MONGO_USER = credentials('MONGO_USER')
