@@ -35,10 +35,10 @@ pipeline {
 
          stage('Run Backend Container') {
                     environment {
-                        MONGO_DATABASE = credentials('MONGO_DATABASE')
-                        MONGO_USER = credentials('MONGO_USER')
-                        MONGO_PASS = credentials('MONGO_PASS')
-                        MONGO_CLUSTER = credentials('MONGO_CLUSTER')
+                        MONGO_DATABASE = "job-portal-db"
+                        MONGO_USER = "kaustubh8shelar"
+                        MONGO_PASS = "07XhFUfyqSIh23xV"
+                        MONGO_CLUSTER = "cluster0.zgk3h.mongodb.net"
                     }
                     steps {
                         bat """
