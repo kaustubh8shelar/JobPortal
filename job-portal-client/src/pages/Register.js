@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { registerUser } from '../api/auth';
 import axios from 'axios';
+import { getCompanyByName } from '../api/company';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -56,8 +57,28 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, skills: value }));
   };
 
-  const handleCompanyChange = (_, value) => {
-    setFormData((prev) => ({ ...prev, companyId: value || '' }));
+  const handleCompanyChange = async (_, value) => {
+    if (!value) {
+      setFormData((prev) => ({ ...prev, companyId: '' }));
+      return;
+    }
+
+    try {
+      const response = await getCompanyByName(value);
+      const companies = response.data;
+      // console.log("Respone ", response);
+      // console.log("companies ", companies);
+      if (companies && companies.length > 0) {
+        const matchedCompany = companies.find(c => c.name.toLowerCase() === value.toLowerCase()) || companies[0];
+        setFormData((prev) => ({ ...prev, companyId: matchedCompany.id }));
+      } else {
+        console.warn('No matching company found');
+        setFormData((prev) => ({ ...prev, companyId: '' }));
+      }
+    } catch (err) {
+      console.error('Error fetching company data', err);
+      setFormData((prev) => ({ ...prev, companyId: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -67,7 +88,7 @@ const Register = () => {
     setLoading(true);
   
     try {
-      console.log("formData: " , formData);
+      // console.log("formData: " , formData);
       const response = await registerUser(formData);
       if (response.status === 200 || response.status === 201) {
         setSuccess('Registration successful. Redirecting to login...');
@@ -82,7 +103,9 @@ const Register = () => {
           skills: [],
           companyId: '',
         });
-        navigate('/login');
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
       }
     } catch (err) {
       const errMsg = err.response?.data || 'Registration failed';
@@ -303,7 +326,6 @@ const Register = () => {
                 disabled={formData.role !== 'Employer'}
                 options={companyOptions}
                 getOptionLabel={(option) => option}
-                value={formData.companyId}
                 inputValue={companyInput}
                 onInputChange={(e, value) => setCompanyInput(value)}
                 onChange={handleCompanyChange}
@@ -311,7 +333,7 @@ const Register = () => {
                 loading={loadingCompanies}
                 renderInput={(params) => (
                   <TextField
-                    required
+                    required={formData.role === 'Employer'}
                     {...params}
                     label="Company Name"
                     placeholder="Start typing to search"

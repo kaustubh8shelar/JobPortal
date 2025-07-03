@@ -40,8 +40,17 @@ const Login = () => {
       const res = await loginUser({ email, password });
       localStorage.setItem("token", res.data);
       localStorage.setItem("isLoggedIn", "true");
-      await getUserByEmail(email);
-      navigate("/jobs");
+       // Get user details (assuming it includes role)
+      const userRes = await getUserByEmail(email);
+      const user = userRes.data;
+      localStorage.setItem("role", user.role); // Save role separately
+
+      // Navigate based on role
+      if (user.role?.toLowerCase() === "employer") {
+        navigate("/employer/dashboard", { replace: true });
+      } else {
+        navigate("/jobs", { replace: true });
+      }
     } catch (error) {
       alert("Login failed");
       setLoading(false);
