@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Container, Card, CardContent, Typography, Stack, Chip, Divider,
   Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Skeleton, Box, Button, Snackbar, Alert, Avatar
+  DialogTitle, Skeleton, Box, Button, Snackbar, Alert, Avatar, Stepper, Step, StepLabel
 } from "@mui/material";
 import Navbar from "../../components/Navbar";
 import GlobalStyles from "../../styles/GlobalStyles";
@@ -13,6 +13,7 @@ import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import { deleteJob } from "../../api/admin";
+import { getApplicationsByJobId, updateApplicationStatus } from "../../api/application";
 
 const EmployerJobDetails = () => {
   const { id } = useParams();
@@ -21,6 +22,9 @@ const EmployerJobDetails = () => {
   const [company, setCompany] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [applications, setApplications] = useState([]);
+  const [showApplicationsDialog, setShowApplicationsDialog] = useState(false);
+  const [confirmationDialog, setConfirmationDialog] = useState({ open: false, applicationId: null, newStatus: "" });
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -50,7 +54,6 @@ const EmployerJobDetails = () => {
   const handleDelete = async () => {
     try {
       const res = await deleteJob(id);
-      console.log("Delete Res: ", res);
       setSnackbar({ open: true, message: "Job deleted successfully!", severity: "success" });
       setTimeout(() => {
         navigate("/employer/dashboard");
@@ -60,6 +63,35 @@ const EmployerJobDetails = () => {
       setSnackbar({ open: true, message: "Failed to delete job.", severity: "error" });
     }
     setOpenDialog(false);
+  };
+
+  const fetchApplications = async () => {
+    try {
+      const response = await getApplicationsByJobId(id);
+      setApplications(response.data);
+      setShowApplicationsDialog(true);
+    } catch (error) {
+      console.error("Failed to fetch applications:", error);
+    }
+  };
+
+  const confirmStatusUpdate = (applicationId, newStatus) => {
+    setConfirmationDialog({ open: true, applicationId, newStatus });
+  };
+
+  const handleStatusUpdateConfirmed = async () => {
+    const { applicationId, newStatus } = confirmationDialog;
+    try {
+      await updateApplicationStatus(applicationId, newStatus);
+      setApplications(prev =>
+        prev.map(app => app.id === applicationId ? { ...app, status: newStatus } : app)
+      );
+      setSnackbar({ open: true, message: `Status updated to ${newStatus}`, severity: "success" });
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      setSnackbar({ open: true, message: "Failed to update status", severity: "error" });
+    }
+    setConfirmationDialog({ open: false, applicationId: null, newStatus: "" });
   };
 
   if (!job) {
@@ -142,15 +174,14 @@ const EmployerJobDetails = () => {
                   <Chip key={index} label={skill} color="primary" variant="outlined" />
                 ))}
               </Stack>
-
-              <Button
-                variant="contained"
-                color="error"
-                sx={{ mt: 3 }}
-                onClick={() => setOpenDialog(true)}
-              >
-                Delete Job Post
-              </Button>
+              <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 3 }}>
+                <Button variant="contained" color="error" onClick={() => setOpenDialog(true)}>
+                  Delete Job Post
+                </Button>
+                <Button variant="contained" color="primary" onClick={fetchApplications}>
+                  View Applications
+                </Button>
+              </Box>
             </CardContent>
           </Box>
         </Card>
@@ -158,9 +189,7 @@ const EmployerJobDetails = () => {
         <Card sx={GlobalStyles.card}>
           <CardContent>
             <Typography variant="h6" sx={GlobalStyles.title}>Job Description</Typography>
-            <Typography variant="body1" sx={GlobalStyles.jobDescription}>
-              {job.description}
-            </Typography>
+            <Typography variant="body1" sx={GlobalStyles.jobDescription}>{job.description}</Typography>
           </CardContent>
         </Card>
       </Container>
@@ -189,6 +218,57 @@ const EmployerJobDetails = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Applications Dialog */}
+      <Dialog open={showApplicationsDialog} onClose={() => setShowApplicationsDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Applications for this Job</DialogTitle>
+        <DialogContent dividers>
+          {applications.length === 0 ? (
+            <Typography>No applications found.</Typography>
+          ) : (
+            applications.map((app, index) => {
+              const stepIndex = ["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired"].indexOf(app.status);
+              return (
+                <Card key={index} sx={{ mb: 2, p: 2 }}>
+                  <Typography><strong>User:</strong> {app.userId}</Typography>
+                  <Typography><strong>Experience:</strong> {app.experience} years</Typography>
+                  <Typography><strong>Education:</strong> {app.education}</Typography>
+
+                  <Stepper activeStep={stepIndex >= 0 ? stepIndex : 0} alternativeLabel sx={{ mt: 2 }}>
+                    {["Applied", "Application Sent", "Awaiting Recruiter Action", "Interview", "Hired"].map((label) => (
+                      <Step key={label}>
+                        <StepLabel
+                          onClick={() => confirmStatusUpdate(app.id, label)}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          {label}
+                        </StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Card>
+              );
+            })
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowApplicationsDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog for Status Change */}
+      <Dialog open={confirmationDialog.open} onClose={() => setConfirmationDialog({ ...confirmationDialog, open: false })}>
+        <DialogTitle>Confirm Status Change</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to change the status to <strong>{confirmationDialog.newStatus}</strong>?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmationDialog({ ...confirmationDialog, open: false })}>Cancel</Button>
+          <Button onClick={handleStatusUpdateConfirmed} color="primary" variant="contained">Confirm</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

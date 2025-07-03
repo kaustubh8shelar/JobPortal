@@ -109,7 +109,7 @@ const Register = () => {
       }
     } catch (err) {
       const errMsg = err.response?.data || 'Registration failed';
-      console.log("errMsg: ", errMsg);
+      console.error("errMsg: ", errMsg);
       setError(errMsg);
     } finally {
       setLoading(false);

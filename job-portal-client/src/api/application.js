@@ -16,3 +16,11 @@ export const applyForJob = async (applicationData) => {
         }
     });
 };
+
+export const getApplicationsByJobId = async (jobId) => {
+    return await axios.get(`${API_BASE_URL}?jobId=${jobId}`);
+};
+
+export const updateApplicationStatus  = async (applicationId, newStatus) => {
+    return await axios.patch(`${API_BASE_URL}/${applicationId}/${newStatus}`);
+};

@@ -13,7 +13,7 @@ import IconButton from "@mui/material/IconButton";
 const experienceRanges = ["0 - 1", "1 - 3", "3 - 5", "5 - 10"];
 const salaryRanges = ["200,000 - 400,000", "400,000 - 700,000", "700,000 - 1,000,000", "1,000,000+"];
 
-const CreateJobPost = ({ open, handleClose }) => {
+const CreateJobPost = ({ open, handleClose, onJobCreated }) => {
   const [formData, setFormData] = useState({
     title: "", description: "", location: "",
     skillsRequired: [], skillInput: "",
@@ -24,6 +24,20 @@ const CreateJobPost = ({ open, handleClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (open) {
+      // Reset form when the dialog opens
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        skillsRequired: [],
+        skillInput: "",
+        requiredExperience: "",
+        requiredEducation: "",
+        salary: "",
+      });
+      setSnackbar({ open: false, message: "", severity: "info" });
+    }
     const fetchUser = async () => {
       try {
         const user = await getCurrentUser();
@@ -73,9 +87,9 @@ const CreateJobPost = ({ open, handleClose }) => {
       await createJob(payload);
       setSnackbar({ open: true, message: "Job created successfully!", severity: "success" });
       setTimeout(() => {
-        handleClose();
-        navigate("/employer/dashboard");
-      }, 1500);
+        onJobCreated();    // trigger the dashboard to refresh
+        handleClose();     // close the dialog
+      }, 1000);
     } catch (err) {
       console.error(err);
       setSnackbar({ open: true, message: "Failed to create job", severity: "error" });

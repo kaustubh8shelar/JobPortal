@@ -29,35 +29,36 @@ const EmployerDashboard = () => {
   const jobsPerPage = 5;
   const navigate = useNavigate();
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (token) {
-        const user = await getCurrentUser();
-        if (user && user.companyId) {
-          const email = user.email;
-          const res = await getEmployerJobs(email);
-          const jobList = res.data;
+        if (token) {
+          const user = await getCurrentUser();
+          if (user && user.companyId) {
+            const email = user.email;
+            const res = await getEmployerJobs(email);
+            const jobList = res.data;
 
-          // Filter jobs posted by the employer's company
-          const filteredJobs = jobList.filter(job => job.companyId === user.companyId);
+            // Filter jobs posted by the employer's company
+            const filteredJobs = jobList.filter(job => job.companyId === user.companyId);
 
-          await fetchCompanyNames(filteredJobs);
-          setJobs(filteredJobs);
+            await fetchCompanyNames(filteredJobs);
+            setJobs(filteredJobs);
+          } else {
+            console.error("User or Company ID not found!");
+          }
         } else {
-          console.error("User or Company ID not found!");
+          console.error("Token not available!");
         }
-      } else {
-        console.error("Token not available!");
+      } catch (err) {
+        console.error("Error fetching jobs", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching jobs", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
     const fetchCompanyNames = async (jobList) => {
       const companyMap = {};
@@ -78,7 +79,7 @@ const EmployerDashboard = () => {
     };
 
     fetchJobs();
-  }, []);
+  }, [refreshKey]);
 
   const indexOfLastJob = page * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
@@ -98,7 +99,11 @@ const EmployerDashboard = () => {
             Create Job Post
           </Button>
         </Box>
-        <CreateJobPost open={openCreateDialog} handleClose={() => setOpenCreateDialog(false)} />
+        <CreateJobPost
+          open={openCreateDialog}
+          handleClose={() => setOpenCreateDialog(false)}
+          onJobCreated={() => setRefreshKey(prev => prev + 1)}
+        />
         <Grid container spacing={2}>
           {loading
             ? [...Array(5)].map((_, index) => (
