@@ -24,7 +24,7 @@ public class AdminController {
     @Autowired
     private ApplicationService applicationService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPLOYER', 'ADMIN')")
     @DeleteMapping("/jobs/{id}")
     public ResponseEntity<?> deleteJob(@PathVariable String id){
         try{

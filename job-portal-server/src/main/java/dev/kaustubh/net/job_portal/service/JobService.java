@@ -183,9 +183,6 @@ public class JobService {
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
         List<Job> allJobs = jobRepository.findAll();
-        for(Job job: allJobs){
-//            System.out.println("job: "+job.getTitle());
-        }
 
         return allJobs.stream()
                 .filter(job -> hasMatchingSkills(job, candidate))
