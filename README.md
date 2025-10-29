@@ -26,5 +26,5 @@ job-portal/
 
 ## Web Application URL
 
-https://ks-jobs.netlify.app
+https://jobnudge.netlify.app
 
